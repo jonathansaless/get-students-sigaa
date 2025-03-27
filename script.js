@@ -39,22 +39,23 @@ function extractAlunoData(row, strongIndex, emOffset) {
     const strongTags = row.querySelectorAll('strong');
     const emTags = row.querySelectorAll('em');
 
-    if (strongTags.length > strongIndex) aluno['nome'] = normalizeText(strongTags[strongIndex].textContent.trim());
-    if (emTags.length > emOffset) aluno['curso'] = normalizeText(emTags[emOffset].textContent.trim());
-    if (emTags.length > emOffset + 1) aluno['matricula'] = normalizeText(emTags[emOffset + 1].textContent.trim());
-    if (emTags.length > emOffset + 2) aluno['usuario'] = normalizeText(emTags[emOffset + 2].textContent.trim());
-    if (emTags.length > emOffset + 3) aluno['email'] = normalizeText(emTags[emOffset + 3].textContent.trim());
+    if (strongTags.length > strongIndex) aluno['nome'] = strongTags[strongIndex].textContent.trim();
+    if (emTags.length > emOffset) aluno['curso'] = emTags[emOffset].textContent.trim();
+    if (emTags.length > emOffset + 1) aluno['matricula'] = emTags[emOffset + 1].textContent.trim();
+    if (emTags.length > emOffset + 2) aluno['usuario'] = emTags[emOffset + 2].textContent.trim();
+    if (emTags.length > emOffset + 3) aluno['email'] = emTags[emOffset + 3].textContent.trim();
 
     return aluno;
 }
 
-function normalizeText(text) {
-    return text.normalize('NFKD').replace(/[\u0300-\u036F]/g, "");
-}
-
 function generateCSV(data) {
+    // Utiliza a biblioteca PapaParse para gerar CSV
     const csv = Papa.unparse(data, { quotes: true });
+
+    // Criação do Blob com a codificação correta para UTF-8 (garante preservação de caracteres especiais)
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+    // Criação de um link para download do arquivo CSV
     const url = URL.createObjectURL(blob);
     const downloadLink = document.getElementById('downloadLink');
     downloadLink.href = url;
