@@ -25,18 +25,18 @@ function processFile() {
                 const strongTags = row.querySelectorAll('strong');
                 const emTags = row.querySelectorAll('em');
 
-                if (strongTags.length > 0) aluno1['nome'] = strongTags[0].textContent.trim();
-                if (emTags.length > 0) aluno1['curso'] = emTags[0].textContent.trim();
-                if (emTags.length > 1) aluno1['matricula'] = emTags[1].textContent.trim();
-                if (emTags.length > 2) aluno1['usuario'] = emTags[2].textContent.trim();
-                if (emTags.length > 3) aluno1['email'] = emTags[3].textContent.trim();
+                if (strongTags.length > 0) aluno1['nome'] = normalizeText(strongTags[0].textContent.trim());
+                if (emTags.length > 0) aluno1['curso'] = normalizeText(emTags[0].textContent.trim());
+                if (emTags.length > 1) aluno1['matricula'] = normalizeText(emTags[1].textContent.trim());
+                if (emTags.length > 2) aluno1['usuario'] = normalizeText(emTags[2].textContent.trim());
+                if (emTags.length > 3) aluno1['email'] = normalizeText(emTags[3].textContent.trim());
                 alunos.push(aluno1);
 
-                if (strongTags.length > 1) aluno2['nome'] = strongTags[1].textContent.trim();
-                if (emTags.length > 4) aluno2['curso'] = emTags[4].textContent.trim();
-                if (emTags.length > 5) aluno2['matricula'] = emTags[5].textContent.trim();
-                if (emTags.length > 6) aluno2['usuario'] = emTags[6].textContent.trim();
-                if (emTags.length > 7) aluno2['email'] = emTags[7].textContent.trim();
+                if (strongTags.length > 1) aluno2['nome'] = normalizeText(strongTags[1].textContent.trim());
+                if (emTags.length > 4) aluno2['curso'] = normalizeText(emTags[4].textContent.trim());
+                if (emTags.length > 5) aluno2['matricula'] = normalizeText(emTags[5].textContent.trim());
+                if (emTags.length > 6) aluno2['usuario'] = normalizeText(emTags[6].textContent.trim());
+                if (emTags.length > 7) aluno2['email'] = normalizeText(emTags[7].textContent.trim());
                 alunos.push(aluno2);
             });
 
@@ -46,7 +46,11 @@ function processFile() {
         }
     };
 
-    reader.readAsText(file);
+    reader.readAsText(file, 'UTF-8');
+}
+
+function normalizeText(text) {
+    return text.normalize('NFKD').replace(/[\u0300-\u036F]/g, "");
 }
 
 function generateCSV(data) {
