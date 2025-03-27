@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import csv
 
 # Carregar o HTML salvo localmente
-with open('pagina.html', 'r', encoding='utf-8') as file:
+with open('turma_teste.html', 'r', encoding='utf-8') as file:
     html = file.read()
 
 # Analisar o HTML

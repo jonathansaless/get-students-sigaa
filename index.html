@@ -5,14 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Scraper</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
     <h1>Upload HTML File</h1>
-    <input type="file" id="fileInput" accept=".html">
-    <button onclick="processFile()">Upload</button>
-    <a id="downloadLink" style="display: none;">Download CSV</a>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
-    <script src="script.js"></script>
+    <input type="file" id="fileInput" accept=".html"><br><br>
+
+    <label>Escolha o formato para download:</label><br>
+    <input type="radio" id="formatoCSV" name="formatoDownload" value="csv" checked>
+    <label for="formatoCSV">CSV</label>
+    <input type="radio" id="formatoXLSX" name="formatoDownload" value="xlsx">
+    <label for="formatoXLSX">XLSX</label><br><br>
+
+    <button onclick="processFile()">Upload e Processar</button>
+    <a id="downloadLink" style="display: none;">Download Arquivo</a>
+
+    <script>
+        function processFile() {
+            const fileInput = document.getElementById('fileInput');
+            const downloadFormat = document.querySelector('input[name="formatoDownload"]:checked').value;
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please upload a file first.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const html = event.target.result;
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const tables = doc.querySelectorAll('table.participantes');
+
+                if (tables.length > 1) {
+                    const table = tables[1];
+                    const rows = table.querySelectorAll('tr');
+                    const alunos = [];
+
+                    rows.forEach(row => {
+                        const aluno1 = extractAlunoData(row, 0, 4);
+                        const aluno2 = extractAlunoData(row, 1, 4);
+                        alunos.push(aluno1, aluno2);
+                    });
+
+                    if (downloadFormat === 'csv') {
+                        generateCSV(alunos);
+                    } else if (downloadFormat === 'xlsx') {
+                        generateXLSX(alunos);
+                    } else {
+                        alert("Formato de download inválido.");
+                    }
+
+                } else {
+                    alert("Não foi possível encontrar a segunda tabela com a classe 'participantes'.");
+                }
+            };
+
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function extractAlunoData(row, strongIndex, emOffset) {
+            const aluno = {};
+            const strongTags = row.querySelectorAll('strong');
+            const emTags = row.querySelectorAll('em');
+
+            if (strongTags.length > strongIndex) aluno['nome'] = strongTags[strongIndex].textContent.trim();
+            if (emTags.length > emOffset) aluno['curso'] = emTags[emOffset].textContent.trim();
+            if (emTags.length > emOffset + 1) aluno['matricula'] = emTags[emOffset + 1].textContent.trim();
+            if (emTags.length > emOffset + 2) aluno['usuario'] = emTags[emOffset + 2].textContent.trim();
+            if (emTags.length > emOffset + 3) aluno['email'] = emTags[emOffset + 3].textContent.trim();
+
+            return aluno;
+        }
+
+        function generateCSV(data) {
+            const csv = Papa.unparse(data, { quotes: true });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const downloadLink = document.getElementById('downloadLink');
+            downloadLink.href = url;
+            downloadLink.download = 'alunos.csv';
+            downloadLink.style.display = 'block';
+            downloadLink.textContent = 'Download CSV';
+        }
+
+        function generateXLSX(data) {
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Alunos");
+            const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([new Uint8Array(wbout)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+            const url = URL.createObjectURL(blob);
+            const downloadLink = document.getElementById('downloadLink');
+            downloadLink.href = url;
+            downloadLink.download = 'alunos.xlsx';
+            downloadLink.style.display = 'block';
+            downloadLink.textContent = 'Download XLSX';
+        }
+    </script>
 </body>
 </html>

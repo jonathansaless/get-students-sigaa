@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processador de Arquivos CSV/XLSX</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <h1>Processador de Arquivos CSV/XLSX</h1>
+    <form id="csvForm">
+        <label for="csvFile">Selecione o arquivo CSV:</label>
+        <input type="file" id="csvFile" accept=".csv" required><br><br>
+
+        <label for="periodoLetivo">Insira o período letivo (ex: 2024/2):</label>
+        <input type="text" id="periodoLetivo" required><br><br>
+
+        <label>Escolha a opção de turma:</label><br>
+        <input type="radio" id="opcao1" name="opcaoTurma" value="1" checked>
+        <label for="opcao1">Cálculo 1 - Manhã</label><br>
+        <input type="radio" id="opcao2" name="opcaoTurma" value="2">
+        <label for="opcao2">Cálculo 2 - Manhã</label><br>
+        <input type="radio" id="opcao3" name="opcaoTurma" value="3">
+        <label for="opcao3">Cálculo 1 - Tarde</label><br>
+        <input type="radio" id="opcao4" name="opcaoTurma" value="4">
+        <label for="opcao4">Cálculo 2 - Tarde</label><br><br>
+
+        <label>Escolha o formato para download:</label><br>
+        <input type="radio" id="formatoCSV" name="formatoDownload" value="csv" checked>
+        <label for="formatoCSV">CSV</label>
+        <input type="radio" id="formatoXLSX" name="formatoDownload" value="xlsx">
+        <label for="formatoXLSX">XLSX</label><br><br>
+
+        <button type="submit">Processar Arquivo</button>
+    </form>
+    <pre id="result" style="display:none;"></pre>
+    <a id="downloadLink" style="display:none;">Download Arquivo</a>
+
+    <script>
+        document.getElementById('csvForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const fileInput = document.getElementById('csvFile');
+            const periodoLetivo = document.getElementById('periodoLetivo').value;
+            const opcaoTurma = document.querySelector('input[name="opcaoTurma"]:checked').value;
+            const formatoDownload = document.querySelector('input[name="formatoDownload"]:checked').value;
+
+            if (!periodoLetivo) {
+                alert("Por favor, insira o período letivo.");
+                return;
+            }
+
+            if (fileInput.files.length === 0) {
+                alert("Por favor, selecione um arquivo CSV.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const text = e.target.result;
+                processCSV(text, opcaoTurma, periodoLetivo, formatoDownload);
+            };
+
+            reader.readAsText(file);
+        });
+
+        function processCSV(text, opcaoTurma, periodoLetivo, formatoDownload) {
+            const rows = Papa.parse(text, { header: true }).data;
+
+            let turno;
+            switch (opcaoTurma) {
+                case "1":
+                case "2":
+                    turno = "MANHÃ";
+                    break;
+                case "3":
+                case "4":
+                    turno = "TARDE";
+                    break;
+                default:
+                    alert("Opção de turma inválida.");
+                    return;
+            }
+
+            const output = [];
+            output.push(['Username', 'Password', 'Firstname', 'Lastname', 'Email', 'City', 'Course1', 'Group1', 'Type1', 'Group2', 'Type2']);
+
+            rows.forEach(row => {
+                const email = row['email'];
+                const fullName = row['nome'];
+                const names = fullName.split(' ');
+                const firstname = names[0].toUpperCase();
+                const lastname = names.slice(1).map(name => name.toUpperCase()).join(' ');
+                const curso = row['curso'].split('/')[0].trim();
+                const group1 = `${curso} - ${turno}`;
+                const group2 = turno.charAt(0).toUpperCase() + turno.slice(1).toLowerCase();
+
+                output.push([email, 'newton123', firstname, lastname, email, 'Belém', `Página inicial Cálculo - ${periodoLetivo}`, group1, '1', group2, '1']);
+            });
+
+            const downloadLink = document.getElementById('downloadLink');
+            downloadLink.style.display = 'block';
+            downloadLink.textContent = `Download Arquivo (${formatoDownload.toUpperCase()})`;
+
+            if (formatoDownload === 'csv') {
+                const resultCSV = Papa.unparse(output, { quotes: true });
+                const blob = new Blob([resultCSV], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = `result_${opcaoTurma}.csv`;
+            } else if (formatoDownload === 'xlsx') {
+                const worksheet = XLSX.utils.aoa_to_sheet(output);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+                const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([new Uint8Array(wbout)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+                const url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = `result_${opcaoTurma}.xlsx`;
+            } else {
+                alert("Formato de download inválido.");
+                downloadLink.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
