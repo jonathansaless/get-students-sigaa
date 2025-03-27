@@ -1,1 +1,2 @@
-# get-students-sigaa
+# Gerar planilha com alunos do Sigaa
+O sistema 
