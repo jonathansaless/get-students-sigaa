@@ -137,6 +137,7 @@
             output.push(['Username', 'Password', 'Firstname', 'Lastname', 'Email', 'City', 'Course1', 'Group1', 'Type1', 'Group2', 'Type2']);
 
             rows.forEach(row => {
+                const matricula = row['matricula']
                 const email = row['email'];
                 const fullName = row['nome'];
                 const names = fullName.split(' ');
@@ -146,7 +147,7 @@
                 const group1 = `${curso} - ${turno}`;
                 const group2 = turno.charAt(0).toUpperCase() + turno.slice(1).toLowerCase();
 
-                output.push([email, 'newton123', firstname, lastname, email, 'Belém', `Página inicial Cálculo - ${periodoLetivo}`, group1, '1', group2, '1']);
+                output.push([matricula, 'newton123', firstname, lastname, email, 'Belém', `Página inicial Cálculo - ${periodoLetivo}`, group1, '1', group2, '1']);
             });
 
             const turmaMap = {
