@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Add Bootstrap CSS for better design -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
 </head>
 <body>
@@ -55,30 +54,36 @@
             const downloadFormat = document.querySelector('input[name="formatoDownload"]:checked').value;
             const opcaoTurma = document.querySelector('input[name="opcaoTurma"]:checked').value;
             const file = fileInput.files[0];
-    
+
             if (!file) {
                 alert('Faça o upload de um arquivo primeiro.');
                 return;
             }
-    
+
             const reader = new FileReader();
             reader.onload = function(event) {
                 const html = event.target.result;
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 const tables = doc.querySelectorAll('table.participantes');
-    
+
                 if (tables.length > 1) {
                     const table = tables[1];
                     const rows = table.querySelectorAll('tr');
                     const alunos = [];
-    
+
                     rows.forEach(row => {
                         const aluno1 = extractAlunoData(row, 0);
                         const aluno2 = extractAlunoData(row, 1);
-                        alunos.push(aluno1, aluno2);
+
+                        if (aluno1 && aluno1.nome) { // Check if aluno1 is not null and has a name
+                            alunos.push(aluno1);
+                        }
+                        if (aluno2 && aluno2.nome) { // Check if aluno2 is not null and has a name
+                             alunos.push(aluno2);
+                         }
                     });
-    
+
                     if (downloadFormat === 'csv') {
                         generateCSV(alunos, opcaoTurma);
                     } else if (downloadFormat === 'xlsx') {
@@ -86,30 +91,38 @@
                     } else {
                         alert("Formato de download inválido.");
                     }
-    
+
                 } else {
                     alert("Não foi possível encontrar a segunda tabela com a classe 'participantes'.");
                 }
             };
-    
+
             reader.readAsText(file, 'UTF-8');
         }
-    
+
         function extractAlunoData(row, alunoIndex) {
             const aluno = {};
             const strongTags = row.querySelectorAll('strong');
             const emTags = row.querySelectorAll('em');
-    
+
             const baseIndex = alunoIndex * 4;
-            if (strongTags.length > alunoIndex) aluno['nome'] = strongTags[alunoIndex].textContent.trim();
-            if (emTags.length > baseIndex) aluno['curso'] = emTags[baseIndex].textContent.trim();
-            if (emTags.length > baseIndex + 1) aluno['matricula'] = emTags[baseIndex + 1].textContent.trim();
+            if (strongTags.length > alunoIndex && strongTags[alunoIndex].textContent.trim()) {
+                 aluno['nome'] = strongTags[alunoIndex].textContent.trim();
+            }
+            if (emTags.length > baseIndex && emTags[baseIndex].textContent.trim()) {
+                 aluno['curso'] = emTags[baseIndex].textContent.trim();
+            }
+            if (emTags.length > baseIndex + 1 && emTags[baseIndex + 1].textContent.trim()) {
+                 aluno['matricula'] = emTags[baseIndex + 1].textContent.trim();
+            }
             // if (emTags.length > baseIndex + 2) aluno['usuario'] = emTags[baseIndex + 2].textContent.trim();
-            if (emTags.length > baseIndex + 3) aluno['email'] = emTags[baseIndex + 3].textContent.trim();
-    
+            if (emTags.length > baseIndex + 3 && emTags[baseIndex + 3].textContent.trim()) {
+                 aluno['email'] = emTags[baseIndex + 3].textContent.trim();
+             }
+
             return aluno;
         }
-    
+
         function generateCSV(data, opcaoTurma) {
             const turmaMap = {
                 "1": "calculo_1_manha",
@@ -128,7 +141,7 @@
             downloadLink.style.display = 'block';
             downloadLink.textContent = 'Download CSV';
         }
-    
+
         function generateXLSX(data, opcaoTurma) {
             const turmaMap = {
                 "1": "calculo_1_manha",
