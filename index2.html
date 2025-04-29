@@ -118,14 +118,22 @@
         }
 
         function processRows(rows, opcaoTurma, periodoLetivo, formatoDownload) {
-            let turno;
+            let turno, turmaNumber;
             switch (opcaoTurma) {
                 case "1":
+                    turmaNumber = "1";
+                    turno = "MANHÃ";
+                    break;
                 case "2":
+                    turmaNumber = "2";
                     turno = "MANHÃ";
                     break;
                 case "3":
+                    turmaNumber = "1";
+                    turno = "TARDE";
+                    break;
                 case "4":
+                    turmaNumber = "2";
                     turno = "TARDE";
                     break;
                 default:
@@ -144,10 +152,11 @@
                 const firstname = names[0].toUpperCase();
                 const lastname = names.slice(1).map(name => name.toUpperCase()).join(' ');
                 const curso = row['curso'].split('/')[0].trim();
-                const group1 = `${curso} - ${turno}`;
+                const group1 = `${curso}`;
                 const group2 = turno.charAt(0).toUpperCase() + turno.slice(1).toLowerCase();
+                const turma = turmaNumber;
 
-                output.push([matricula, 'newton123', firstname, lastname, email, 'Belém', `Página inicial Cálculo - ${periodoLetivo}`, group1, '1', group2, '1']);
+                output.push([matricula, 'newton123', firstname, lastname, email, 'Belém', `Página inicial Cálculo ${turma} - ${periodoLetivo}`, group1, '1', group2, '1']);
             });
 
             const turmaMap = {
