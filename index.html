@@ -104,7 +104,7 @@
             if (strongTags.length > alunoIndex) aluno['nome'] = strongTags[alunoIndex].textContent.trim();
             if (emTags.length > baseIndex) aluno['curso'] = emTags[baseIndex].textContent.trim();
             if (emTags.length > baseIndex + 1) aluno['matricula'] = emTags[baseIndex + 1].textContent.trim();
-            if (emTags.length > baseIndex + 2) aluno['usuario'] = emTags[baseIndex + 2].textContent.trim();
+            // if (emTags.length > baseIndex + 2) aluno['usuario'] = emTags[baseIndex + 2].textContent.trim();
             if (emTags.length > baseIndex + 3) aluno['email'] = emTags[baseIndex + 3].textContent.trim();
     
             return aluno;
