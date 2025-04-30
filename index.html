@@ -1,54 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extração de alunos do Sigaa para uma planilha</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
-</head>
-<body style="background-color: rgb(8, 118, 133);">
-    <div class="container mt-5">
-        <h1 class="text-center">Faça o upload do arquivo HTML</h1>
-        <div class="text-center">
-            <input type="file" id="fileInput" class="form-control-file" accept=".html, .htm"><br><br>
 
-            <label>Escolha a turma:</label><br>
-            <div class="form-check form-check-inline">
-                <input type="radio" id="turma1" name="opcaoTurma" value="1" checked class="form-check-input">
-                <label for="turma1" class="form-check-label">Cálculo 1 - Manhã</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input type="radio" id="turma2" name="opcaoTurma" value="2" class="form-check-input">
-                <label for="turma2" class="form-check-label">Cálculo 2 - Manhã</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input type="radio" id="turma3" name="opcaoTurma" value="3" class="form-check-input">
-                <label for="turma3" class="form-check-label">Cálculo 1 - Tarde</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input type="radio" id="turma4" name="opcaoTurma" value="4" class="form-check-input">
-                <label for="turma4" class="form-check-label">Cálculo 2 - Tarde</label>
-            </div><br><br>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Extração de dados dos alunos no Sigaa
+        </title>
+        <link rel="stylesheet" href="style.css">
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+        <link rel="stylesheet" href="style.css">
+    </head>
 
-            <label>Escolha o formato para download:</label><br>
-            <div class="form-check form-check-inline">
-                <input type="radio" id="formatoCSV" name="formatoDownload" value="csv" checked class="form-check-input">
-                <label for="formatoCSV" class="form-check-label">CSV</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input type="radio" id="formatoXLSX" name="formatoDownload" value="xlsx" class="form-check-input">
-                <label for="formatoXLSX" class="form-check-label">XLSX</label>
-            </div><br><br>
+    <body style="background-color: rgb(93, 99, 100);">
+        <div class="container mt-5">
+            <h1 class="text-center">Extração de dados dos alunos no Sigaa</h1>
+            <div id="fileForm" class="text-center">
+                <label for="fileInput" class="form-label">
+                    <b>Selecione o Arquivo HTML baixado no Sigaa</b>
+                </label>
+                <input type="file" id="fileInput" class="form-control"
+                    accept=".html, .htm"><br><br>
 
-            <button onclick="processFile()" class="btn btn-primary">Realizar upload e processar</button>
-            <a id="downloadLink" class="btn btn-success mt-3" style="display: none;">Download Arquivo</a>
+                <label><b>Escolha a turma:</b></label><br>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="turma1" name="opcaoTurma" value="1"
+                        checked class="form-check-input">
+                    <label for="turma1" class="form-check-label">Cálculo 1 -
+                        Manhã</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="turma2" name="opcaoTurma" value="2"
+                        class="form-check-input">
+                    <label for="turma2" class="form-check-label">Cálculo 2 -
+                        Manhã</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="turma3" name="opcaoTurma" value="3"
+                        class="form-check-input">
+                    <label for="turma3" class="form-check-label">Cálculo 1 -
+                        Tarde</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="turma4" name="opcaoTurma" value="4"
+                        class="form-check-input">
+                    <label for="turma4" class="form-check-label">Cálculo 2 -
+                        Tarde</label>
+                </div><br><br>
+
+                <label><b>Escolha o formato para download:</b></label><br>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="formatoCSV" name="formatoDownload"
+                        value="csv" checked class="form-check-input">
+                    <label for="formatoCSV" class="form-check-label">CSV</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="formatoXLSX" name="formatoDownload"
+                        value="xlsx" class="form-check-input">
+                    <label for="formatoXLSX"
+                        class="form-check-label">XLSX</label>
+                </div><br><br>
+
+                <button onclick="processFile()" class="btn btn-primary">Realizar
+                    upload e processar</button>
+                <a id="downloadLink" class="btn btn-success mt-3"
+                    style="display: none;">Download Arquivo</a>
+                </div>
         </div>
-    </div>
 
-    <script>
+        <script>
         function processFile() {
             const fileInput = document.getElementById('fileInput');
             const downloadFormat = document.querySelector('input[name="formatoDownload"]:checked').value;
@@ -61,7 +85,7 @@
             }
 
             const reader = new FileReader();
-            reader.onload = function(event) {
+            reader.onload = function (event) {
                 const html = event.target.result;
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
@@ -80,8 +104,8 @@
                             alunos.push(aluno1);
                         }
                         if (aluno2 && aluno2.nome) { // Check if aluno2 is not null and has a name
-                             alunos.push(aluno2);
-                         }
+                            alunos.push(aluno2);
+                        }
                     });
 
                     if (downloadFormat === 'csv') {
@@ -107,18 +131,18 @@
 
             const baseIndex = alunoIndex * 4;
             if (strongTags.length > alunoIndex && strongTags[alunoIndex].textContent.trim()) {
-                 aluno['nome'] = strongTags[alunoIndex].textContent.trim();
+                aluno['nome'] = strongTags[alunoIndex].textContent.trim();
             }
             if (emTags.length > baseIndex && emTags[baseIndex].textContent.trim()) {
-                 aluno['curso'] = emTags[baseIndex].textContent.trim();
+                aluno['curso'] = emTags[baseIndex].textContent.trim();
             }
             if (emTags.length > baseIndex + 1 && emTags[baseIndex + 1].textContent.trim()) {
-                 aluno['matricula'] = emTags[baseIndex + 1].textContent.trim();
+                aluno['matricula'] = emTags[baseIndex + 1].textContent.trim();
             }
             // if (emTags.length > baseIndex + 2) aluno['usuario'] = emTags[baseIndex + 2].textContent.trim();
             if (emTags.length > baseIndex + 3 && emTags[baseIndex + 3].textContent.trim()) {
-                 aluno['email'] = emTags[baseIndex + 3].textContent.trim();
-             }
+                aluno['email'] = emTags[baseIndex + 3].textContent.trim();
+            }
 
             return aluno;
         }
@@ -164,5 +188,6 @@
             downloadLink.textContent = 'Download XLSX';
         }
     </script>
-</body>
+    </body>
+
 </html>

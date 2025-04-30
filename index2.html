@@ -1,64 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Processador de Arquivos CSV/XLSX</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Add Bootstrap CSS for better design -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="container mt-5">
-        <h1 class="text-center">Processador de Arquivos CSV/XLSX</h1>
-        <form id="fileForm" class="text-center">
-            <div class="mb-3">
-                <label for="fileInput" class="form-label">Selecione o arquivo CSV/XLSX:</label>
-                <input type="file" id="fileInput" class="form-control" accept=".csv, .xlsx" required>
-            </div>
-            <div class="mb-3">
-                <label for="periodoLetivo" class="form-label">Insira o período letivo (ex: 2024/2):</label>
-                <input type="text" id="periodoLetivo" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Escolha a opção de turma:</label><br>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="opcao1" name="opcaoTurma" value="1" checked class="form-check-input">
-                    <label for="opcao1" class="form-check-label">Cálculo 1 - Manhã</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="opcao2" name="opcaoTurma" value="2" class="form-check-input">
-                    <label for="opcao2" class="form-check-label">Cálculo 2 - Manhã</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="opcao3" name="opcaoTurma" value="3" class="form-check-input">
-                    <label for="opcao3" class="form-check-label">Cálculo 1 - Tarde</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="opcao4" name="opcaoTurma" value="4" class="form-check-input">
-                    <label for="opcao4" class="form-check-label">Cálculo 2 - Tarde</label>
-                </div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Escolha o formato para download:</label><br>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="formatoCSV" name="formatoDownload" value="csv" checked class="form-check-input">
-                    <label for="formatoCSV" class="form-check-label">CSV</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="formatoXLSX" name="formatoDownload" value="xlsx" class="form-check-input">
-                    <label for="formatoXLSX" class="form-check-label">XLSX</label>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Processar Arquivo</button>
-        </form>
-        <pre id="result" style="display:none;" class="mt-4"></pre>
-        <a id="downloadLink" class="btn btn-success mt-3" style="display:none;">Download Arquivo</a>
-    </div>
 
-    <script>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Adaptação dos dados para o Moodle</title>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+        <div class="container mt-5">
+            <h1 class="text-center">
+                Adaptação dos dados para o Moodle
+            </h1>
+            <form id="fileForm" class="text-center">
+                <div class="mb-3">
+                    <label for="fileInput" class="form-label"><b>Selecione o
+                            arquivo CSV/XLSX:</b></label>
+                    <input type="file" id="fileInput" class="form-control"
+                        accept=".csv, .xlsx" required>
+                </div>
+                <div class="mb-3">
+                    <label for="periodoLetivo" class="form-label"><b>Insira o
+                            período letivo (ex: 2024/2):</b></label>
+                    <input type="text" id="periodoLetivo" class="form-control"
+                        required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><b>Escolha a opção de
+                            turma:</b></label><br>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="opcao1" name="opcaoTurma"
+                            value="1" checked class="form-check-input">
+                        <label for="opcao1" class="form-check-label">Cálculo 1 -
+                            Manhã</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="opcao2" name="opcaoTurma"
+                            value="2" class="form-check-input">
+                        <label for="opcao2" class="form-check-label">Cálculo 2 -
+                            Manhã</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="opcao3" name="opcaoTurma"
+                            value="3" class="form-check-input">
+                        <label for="opcao3" class="form-check-label">Cálculo 1 -
+                            Tarde</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="opcao4" name="opcaoTurma"
+                            value="4" class="form-check-input">
+                        <label for="opcao4" class="form-check-label">Cálculo 2 -
+                            Tarde</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><b>Escolha o formato para
+                            download:</b>
+                    </label><br>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="formatoCSV"
+                            name="formatoDownload" value="csv" checked
+                            class="form-check-input">
+                        <label for="formatoCSV"
+                            class="form-check-label">CSV</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="formatoXLSX"
+                            name="formatoDownload" value="xlsx"
+                            class="form-check-input">
+                        <label for="formatoXLSX"
+                            class="form-check-label">XLSX</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Processar
+                    Arquivo</button>
+            </form>
+            <pre id="result" style="display:none;" class="mt-4"></pre>
+            <a id="downloadLink" class="btn btn-success mt-3"
+                style="display:none;">Download Arquivo</a>
+        </div>
+
+        <script>
         document.getElementById('fileForm').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -192,5 +221,6 @@
             }
         }
     </script>
-</body>
+    </body>
+
 </html>
