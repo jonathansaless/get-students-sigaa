@@ -152,7 +152,7 @@
                 const firstname = names[0].toUpperCase();
                 const lastname = names.slice(1).map(name => name.toUpperCase()).join(' ');
                 const curso = row['curso'].split('/')[0].trim();
-                const group1 = `${curso}`;
+                const group1 = `${curso} - ${turno}`;
                 const group2 = turno.charAt(0).toUpperCase() + turno.slice(1).toLowerCase();
                 const turma = turmaNumber;
 
