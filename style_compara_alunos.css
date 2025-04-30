@@ -25,3 +25,16 @@ body {
         background-position: 0% 50%;
     }
 }
+
+.form-control {
+    margin: 0 auto;
+    max-width: 70%;
+}
+
+.mt-5 {
+    text-align: center;
+}
+
+#compareButton {
+    max-width: 40%;
+}
