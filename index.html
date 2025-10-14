@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Extração de dados dos alunos no Sigaa
+        <title>Extração e Adaptação de dados dos alunos no Sigaa para Moodle
         </title>
         <link rel="stylesheet" href="styles/style.css">
         <script
@@ -18,13 +18,31 @@
 
     <body style="background-color: rgb(93, 99, 100);">
         <div class="container mt-5">
-            <h1 class="text-center">Extração de dados dos alunos no Sigaa</h1>
+            <h1 class="text-center">Extração e Adaptação de dados dos alunos no
+                Sigaa para Moodle</h1>
             <div id="fileForm" class="text-center">
                 <label for="fileInput" class="form-label">
                     <b>Selecione o Arquivo HTML baixado no Sigaa</b>
                 </label>
                 <input type="file" id="fileInput" class="form-control"
                     accept=".html, .htm"><br><br>
+
+                <!-- Campo para o período letivo, adicionado de index2.html -->
+                <div class="mb-3">
+                    <label for="periodoLetivo" class="form-label"><b>Insira o
+                            período letivo (ex: 2024/2):</b></label>
+                    <input type="text" id="periodoLetivo" class="form-control"
+                        required>
+                </div>
+
+                <!-- Novo campo para o link do curso/sala -->
+                <div class="mb-3">
+                    <label for="linkCursoSala" class="form-label"><b>Insira o
+                            link do Curso/Sala (ex:
+                            https://ead.ufpa.br/course/view.php?id=7072):</b></label>
+                    <input type="url" id="linkCursoSala" class="form-control"
+                        required>
+                </div>
 
                 <label><b>Escolha a turma:</b></label><br>
                 <div class="form-check form-check-inline">
@@ -65,11 +83,10 @@
                         class="form-check-label">XLSX</label>
                 </div><br><br>
 
-                <button onclick="processFile()" class="btn btn-primary">Realizar
-                    upload e processar</button>
+                <button onclick="processFile()" class="btn btn-primary">Processar e baixar arquivo</button>
                 <a id="downloadLink" class="btn btn-success mt-3"
-                    style="display: none;">Download Arquivo</a>
-                </div>
+                    style="display: none;"></a>
+            </div>
         </div>
 
         <script>
@@ -77,10 +94,20 @@
             const fileInput = document.getElementById('fileInput');
             const downloadFormat = document.querySelector('input[name="formatoDownload"]:checked').value;
             const opcaoTurma = document.querySelector('input[name="opcaoTurma"]:checked').value;
+            const periodoLetivo = document.getElementById('periodoLetivo').value;
+            const linkCursoSala = document.getElementById('linkCursoSala').value; // Obter o link do curso/sala
             const file = fileInput.files[0];
 
             if (!file) {
                 alert('Faça o upload de um arquivo primeiro.');
+                return;
+            }
+            if (!periodoLetivo) {
+                alert("Por favor, insira o período letivo.");
+                return;
+            }
+            if (!linkCursoSala) { // Validar o link do curso/sala
+                alert("Por favor, insira o link do Curso/Sala.");
                 return;
             }
 
@@ -100,21 +127,16 @@
                         const aluno1 = extractAlunoData(row, 0);
                         const aluno2 = extractAlunoData(row, 1);
 
-                        if (aluno1 && aluno1.nome) { // Check if aluno1 is not null and has a name
+                        if (aluno1 && aluno1.nome) {
                             alunos.push(aluno1);
                         }
-                        if (aluno2 && aluno2.nome) { // Check if aluno2 is not null and has a name
+                        if (aluno2 && aluno2.nome) {
                             alunos.push(aluno2);
                         }
                     });
 
-                    if (downloadFormat === 'csv') {
-                        generateCSV(alunos, opcaoTurma);
-                    } else if (downloadFormat === 'xlsx') {
-                        generateXLSX(alunos, opcaoTurma);
-                    } else {
-                        alert("Formato de download inválido.");
-                    }
+                    // Passar o linkCursoSala para a função processRows
+                    processRows(alunos, opcaoTurma, periodoLetivo, linkCursoSala, downloadFormat);
 
                 } else {
                     alert("Não foi possível encontrar a segunda tabela com a classe 'participantes'.");
@@ -147,45 +169,86 @@
             return aluno;
         }
 
-        function generateCSV(data, opcaoTurma) {
+        // Função processRows adaptada de index2.html para gerar o arquivo Moodle
+        function processRows(rows, opcaoTurma, periodoLetivo, linkCursoSala, formatoDownload) {
+            let turno, turmaNumber;
+            switch (opcaoTurma) {
+                case "1":
+                    turmaNumber = "1";
+                    turno = "MANHÃ";
+                    break;
+                case "2":
+                    turmaNumber = "2";
+                    turno = "MANHÃ";
+                    break;
+                case "3":
+                    turmaNumber = "1";
+                    turno = "TARDE";
+                    break;
+                case "4":
+                    turmaNumber = "2";
+                    turno = "TARDE";
+                    break;
+                default:
+                    alert("Opção de turma inválida.");
+                    return;
+            }
+
+            const output = [];
+            // Adicionar 'Link do Curso/Sala' ao cabeçalho
+            output.push(['Username', 'Password', 'Firstname', 'Lastname', 'Email', 'City', 'Course1', 'Group1', 'Type1', 'Group2', 'Type2', 'Papel no Curso', 'Link do Curso/Sala']);
+
+            rows.forEach(row => {
+                const matricula = row['matricula'] || '';
+                const email = row['email'] || '';
+                const fullName = row['nome'] || '';
+                const names = fullName.split(' ');
+                const firstname = names[0] ? names[0].toUpperCase() : '';
+                const lastname = names.slice(1).map(name => name.toUpperCase()).join(' ');
+                const curso = row['curso'] ? row['curso'].split('/')[0].trim() : '';
+                const group1 = `${curso} - ${turno}`;
+                const group2 = turno.charAt(0).toUpperCase() + turno.slice(1).toLowerCase();
+                const turma = turmaNumber;
+
+                // Adicionar o linkCursoSala à linha de dados
+                output.push([matricula, 'newton123', firstname, lastname, email, 'Belém', `Página inicial Cálculo ${turma} - ${periodoLetivo}`, group1, '1', group2, '1', 'Estudante', linkCursoSala]);
+            });
+
             const turmaMap = {
-                "1": "calculo_1_manha",
-                "2": "calculo_2_manha",
-                "3": "calculo_1_tarde",
-                "4": "calculo_2_tarde"
+                "1": "calculo_1_manha_Moodle",
+                "2": "calculo_2_manha_Moodle",
+                "3": "calculo_1_tarde_Moodle",
+                "4": "calculo_2_tarde_Moodle"
             };
             const turmaName = turmaMap[opcaoTurma];
 
-            const csv = Papa.unparse(data, { quotes: true });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
             const downloadLink = document.getElementById('downloadLink');
-            downloadLink.href = url;
-            downloadLink.download = `${turmaName}.csv`;
-            downloadLink.style.display = 'block';
-            downloadLink.textContent = 'Download CSV';
-        }
+            // downloadLink.style.display = 'block'; // Remover esta linha
+            downloadLink.textContent = `Download Arquivo (${formatoDownload.toUpperCase()})`; // Manter o texto para acessibilidade, mas o link não será visível
 
-        function generateXLSX(data, opcaoTurma) {
-            const turmaMap = {
-                "1": "calculo_1_manha",
-                "2": "calculo_2_manha",
-                "3": "calculo_1_tarde",
-                "4": "calculo_2_tarde"
-            };
-            const turmaName = turmaMap[opcaoTurma];
-
-            const worksheet = XLSX.utils.json_to_sheet(data);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Alunos");
-            const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-            const blob = new Blob([new Uint8Array(wbout)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
-            const url = URL.createObjectURL(blob);
-            const downloadLink = document.getElementById('downloadLink');
-            downloadLink.href = url;
-            downloadLink.download = `${turmaName}.xlsx`;
-            downloadLink.style.display = 'block';
-            downloadLink.textContent = 'Download XLSX';
+            if (formatoDownload === 'csv') {
+                const resultCSV = Papa.unparse(output, { quotes: true });
+                // Adiciona o Byte Order Mark (BOM) para UTF-8
+                const csvWithBOM = "\ufeff" + resultCSV;
+                const blob = new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = `${turmaName}.csv`;
+                downloadLink.click(); // Clicar programaticamente para iniciar o download
+            } else if (formatoDownload === 'xlsx') {
+                const worksheet = XLSX.utils.aoa_to_sheet(output);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+                const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([new Uint8Array(wbout)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+                const url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = `${turmaName}.xlsx`;
+                downloadLink.click(); // Clicar programaticamente para iniciar o download
+            } else {
+                alert("Formato de download inválido.");
+                downloadLink.style.display = 'none';
+            }
         }
     </script>
     </body>
