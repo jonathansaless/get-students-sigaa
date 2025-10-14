@@ -6,71 +6,69 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Extração de dados dos alunos no Sigaa
         </title>
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="styles/style.css">
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
         <link rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
-        <link rel="stylesheet" href="style.css">
     </head>
 
-    <body style="background-color: rgb(93, 99, 100);">
-        <div class="container mt-5">
-            <h1 class="text-center">Extração de dados dos alunos no Sigaa</h1>
-            <div id="fileForm" class="text-center">
-                <label for="fileInput" class="form-label">
-                    <b>Selecione o Arquivo HTML baixado no Sigaa</b>
-                </label>
-                <input type="file" id="fileInput" class="form-control"
-                    accept=".html, .htm"><br><br>
+    <body>
+            <div class="container mt-5">
+                <h1 class="text-center">Extração de dados dos alunos no Sigaa</h1>
+                <div id="fileForm" class="text-center">
+                    <label for="fileInput" class="form-label">
+                        <b>Selecione o Arquivo HTML baixado no Sigaa</b>
+                    </label>
+                    <input type="file" id="fileInput" class="form-control"
+                        accept=".html, .htm"><br><br>
 
-                <label><b>Escolha a turma:</b></label><br>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="turma1" name="opcaoTurma" value="1"
-                        checked class="form-check-input">
-                    <label for="turma1" class="form-check-label">Cálculo 1 -
-                        Manhã</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="turma2" name="opcaoTurma" value="2"
-                        class="form-check-input">
-                    <label for="turma2" class="form-check-label">Cálculo 2 -
-                        Manhã</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="turma3" name="opcaoTurma" value="3"
-                        class="form-check-input">
-                    <label for="turma3" class="form-check-label">Cálculo 1 -
-                        Tarde</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="turma4" name="opcaoTurma" value="4"
-                        class="form-check-input">
-                    <label for="turma4" class="form-check-label">Cálculo 2 -
-                        Tarde</label>
-                </div><br><br>
+                    <label><b>Escolha a turma:</b></label><br>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="turma1" name="opcaoTurma" value="1"
+                            checked class="form-check-input">
+                        <label for="turma1" class="form-check-label">Cálculo 1 -
+                            Manhã</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="turma2" name="opcaoTurma" value="2"
+                            class="form-check-input">
+                        <label for="turma2" class="form-check-label">Cálculo 2 -
+                            Manhã</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="turma3" name="opcaoTurma" value="3"
+                            class="form-check-input">
+                        <label for="turma3" class="form-check-label">Cálculo 1 -
+                            Tarde</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="turma4" name="opcaoTurma" value="4"
+                            class="form-check-input">
+                        <label for="turma4" class="form-check-label">Cálculo 2 -
+                            Tarde</label>
+                    </div><br><br>
 
-                <label><b>Escolha o formato para download:</b></label><br>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="formatoCSV" name="formatoDownload"
-                        value="csv" checked class="form-check-input">
-                    <label for="formatoCSV" class="form-check-label">CSV</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="formatoXLSX" name="formatoDownload"
-                        value="xlsx" class="form-check-input">
-                    <label for="formatoXLSX"
-                        class="form-check-label">XLSX</label>
-                </div><br><br>
+                    <label><b>Escolha o formato para download:</b></label><br>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="formatoCSV" name="formatoDownload"
+                            value="csv" checked class="form-check-input">
+                        <label for="formatoCSV" class="form-check-label">CSV</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="formatoXLSX" name="formatoDownload"
+                            value="xlsx" class="form-check-input">
+                        <label for="formatoXLSX"
+                            class="form-check-label">XLSX</label>
+                    </div><br><br>
 
-                <button onclick="processFile()" class="btn btn-primary">Realizar
-                    upload e processar</button>
-                <a id="downloadLink" class="btn btn-success mt-3"
-                    style="display: none;">Download Arquivo</a>
-                </div>
-        </div>
+                    <button onclick="processFile()" class="btn btn-primary">Processar e baixar arquivo</button>
+                    <a id="downloadLink" class="btn btn-success mt-3"
+                        style="display: none;"></a> <!-- Mantido oculto e sem texto visível -->
+                    </div>
+            </div>
 
         <script>
         function processFile() {
@@ -134,7 +132,8 @@
                 aluno['nome'] = strongTags[alunoIndex].textContent.trim();
             }
             if (emTags.length > baseIndex && emTags[baseIndex].textContent.trim()) {
-                aluno['curso'] = emTags[baseIndex].textContent.trim();
+                // Modificação aqui: pega apenas a parte antes da primeira barra
+                aluno['curso'] = emTags[baseIndex].textContent.trim().split('/')[0].trim();
             }
             if (emTags.length > baseIndex + 1 && emTags[baseIndex + 1].textContent.trim()) {
                 aluno['matricula'] = emTags[baseIndex + 1].textContent.trim();
@@ -157,13 +156,16 @@
             const turmaName = turmaMap[opcaoTurma];
 
             const csv = Papa.unparse(data, { quotes: true });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            // Adiciona o Byte Order Mark (BOM) para UTF-8
+            const csvWithBOM = "\ufeff" + csv;
+            const blob = new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const downloadLink = document.getElementById('downloadLink');
             downloadLink.href = url;
             downloadLink.download = `${turmaName}.csv`;
-            downloadLink.style.display = 'block';
-            downloadLink.textContent = 'Download CSV';
+            // downloadLink.style.display = 'block'; // Remover esta linha
+            // downloadLink.textContent = 'Download CSV'; // Remover esta linha
+            downloadLink.click(); // Clicar programaticamente para iniciar o download
         }
 
         function generateXLSX(data, opcaoTurma) {
@@ -184,8 +186,9 @@
             const downloadLink = document.getElementById('downloadLink');
             downloadLink.href = url;
             downloadLink.download = `${turmaName}.xlsx`;
-            downloadLink.style.display = 'block';
-            downloadLink.textContent = 'Download XLSX';
+            // downloadLink.style.display = 'block'; // Remover esta linha
+            // downloadLink.textContent = 'Download XLSX'; // Remover esta linha
+            downloadLink.click(); // Clicar programaticamente para iniciar o download
         }
     </script>
     </body>
