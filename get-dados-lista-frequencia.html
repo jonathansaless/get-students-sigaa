@@ -87,10 +87,9 @@
                 const html = event.target.result;
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const tables = doc.querySelectorAll('table.participantes');
+                const table = findStudentsTable(doc);
 
-                if (tables.length > 1) {
-                    const table = tables[1];
+                if (table) {
                     const rows = table.querySelectorAll('tr');
                     const alunos = [];
 
@@ -115,11 +114,36 @@
                     }
 
                 } else {
-                    alert("Não foi possível encontrar a segunda tabela com a classe 'participantes'.");
+                    alert("Não foi possível encontrar a tabela de alunos. Abra a página 'Participantes' da turma no SIGAA e envie esse HTML.");
                 }
             };
 
             reader.readAsText(file, 'UTF-8');
+        }
+
+        function findStudentsTable(doc) {
+            const tables = Array.from(doc.querySelectorAll('table.participantes'));
+
+            const studentsTable = tables.find(table => {
+                let previous = table.previousElementSibling;
+                while (previous) {
+                    const legend = previous.querySelector('legend');
+                    if (legend) {
+                        return /alunos\s*\(/i.test(legend.textContent);
+                    }
+                    previous = previous.previousElementSibling;
+                }
+                return false;
+            });
+
+            if (studentsTable) {
+                return studentsTable;
+            }
+
+            return tables.find(table => {
+                const text = table.textContent.replace(/\s+/g, ' ');
+                return /Matr[ií]cula\s*:/i.test(text) && /E-?mail\s*:/i.test(text);
+            }) || null;
         }
 
         function extractAlunoData(row, alunoIndex) {
