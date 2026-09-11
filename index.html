@@ -138,7 +138,7 @@
                     processRows(alunos, opcaoTurma, periodoLetivo, linkCursoSala, downloadFormat);
 
                 } else {
-                    alert("Não foi possível encontrar a tabela de alunos. Abra a página 'Participantes' da turma no SIGAA e envie esse HTML.");
+                    alert(getMissingStudentsTableMessage(doc));
                 }
             };
 
@@ -168,6 +168,16 @@
                 const text = table.textContent.replace(/\s+/g, ' ');
                 return /Matr[ií]cula\s*:/i.test(text) && /E-?mail\s*:/i.test(text);
             }) || null;
+        }
+
+        function getMissingStudentsTableMessage(doc) {
+            const isClassHomePage = doc.querySelector('form[action*="/ava/index.jsf"]');
+
+            if (isClassHomePage) {
+                return "Este arquivo é a página principal da turma e não contém a lista de alunos. No SIGAA, abra Turma > Participantes, aguarde a lista carregar e salve essa página para enviar.";
+            }
+
+            return "Não foi possível encontrar a tabela de alunos. Abra a página 'Participantes' da turma no SIGAA e envie esse HTML.";
         }
 
         function extractAlunoData(row, alunoIndex) {
